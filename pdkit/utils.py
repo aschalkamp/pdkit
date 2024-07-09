@@ -112,6 +112,7 @@ def get_sampling_rate_from_timestamp(d):
     # group on minutes as pandas gives us the same second number
     # for seconds belonging to different minutes
     minutes = d.groupby(d.index.minute)
+    print(minutes)
 
     # get the first minute (0) since we normalised the time above
     sampling_rate = d.iloc[minutes.indices[0]].index.second.value_counts().mean()
@@ -187,6 +188,15 @@ def load_huga_data(filepath):
     sampling_rate = get_sampling_rate_from_timestamp(data)
 
     return data
+
+def load_ppmi_data(filename):
+    dd = pd.read_csv(filename,parse_dates=['time'],index_col=0)
+    dd['mag_sum_acc'] = np.sqrt(dd.x ** 2 + dd.y ** 2 + dd.z ** 2)
+    dd['td'] = (dd.time - dd.time[0]).dt.total_seconds()
+    dd = dd.set_index('time')[['td','x','y','z','mag_sum_acc']]
+    del dd.index.name
+    sampling_rate = get_sampling_rate_from_timestamp(dd)
+    return dd
 
 
 def load_physics_data(filename):
@@ -426,6 +436,8 @@ def load_data(filename, format_file='cloudupdrs', button_left_rect=None, button_
 
     elif format_file == 'physics':
         return load_physics_data(filename)
+    elif format_file == 'ppmi':
+        return load_ppmi_data(filename)
 
     elif format_file == 'freeze':
         return load_freeze_data(filename)

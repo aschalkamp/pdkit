@@ -50,12 +50,13 @@ class TestResultSet:
         except IOError as e:
             ierr = "({}): {}".format(e.errno, e.strerror)
             logging.error("TestResultSet I/O error %s", ierr)
-
+            raise
         except ValueError as verr:
             logging.error("TestResultSet ValueError ->%s", verr.message)
-
+            raise
         except:
             logging.error("Unexpected error on TestResultSet init: %s", sys.exc_info()[0])
+            raise
         logging.debug("TestRestultSet init")
 
     def __get_files_list(self, folder_absolute_path):

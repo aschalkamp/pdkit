@@ -85,8 +85,13 @@ class TremorProcessor:
         df_resampled = data_frame.resample(str(1 / self.sampling_frequency) + 'S').mean()
 
         f = interpolate.interp1d(data_frame.td, data_frame.mag_sum_acc)
-
+        print(len(data_frame.td))
         new_timestamp = np.arange(data_frame.td[0], data_frame.td[-1], 1.0 / self.sampling_frequency)
+        print(len(new_timestamp))
+        if len(new_timestamp) > len(df_resampled):
+            new_timestamp = new_timestamp[:len(df_resampled)]
+        else:
+            df_resampled = df_resampled.iloc[:len(new_timestamp)]
         df_resampled.mag_sum_acc = f(new_timestamp)
 
         logging.debug("resample signal")
